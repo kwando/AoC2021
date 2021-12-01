@@ -1,0 +1,58 @@
+<!-- livebook:{"persist_outputs":true} -->
+
+# Day1
+
+## Section
+
+```elixir
+defmodule Day1 do
+  def part1([x | [y | _] = rest]) when y > x do
+    1 + part1(rest)
+  end
+
+  def part1([_ | rest]), do: part1(rest)
+  def part1([]), do: 0
+
+  def part2(input) do
+    input
+    |> acc_avg()
+    |> part1()
+  end
+
+  def acc_avg([a | [b | [c | _]] = rest]),
+    do: [a + b + c | acc_avg(rest)]
+
+  def acc_avg(_), do: []
+
+  def parse_file(path) do
+    path
+    |> Path.expand(__DIR__)
+    |> File.read!()
+    |> parse_input()
+  end
+
+  def parse_input(input) do
+    input
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.to_integer/1)
+  end
+end
+
+"example.txt"
+|> Day1.parse_file()
+|> Day1.part1()
+```
+
+```output
+7
+```
+
+```elixir
+"input.txt"
+|> Day1.parse_file()
+|> Day1.part2()
+```
+
+```output
+1748
+```
