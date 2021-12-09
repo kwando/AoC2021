@@ -6,8 +6,37 @@ defmodule Day9 do
     |> Enum.sum()
   end
 
+  def part2(map) do
+    for {pos, v} <- find_lowpoints(map) do
+      MapSet.size(find_basin(map, pos))
+    end
+    |> Enum.sort(:desc)
+    |> Enum.take(3)
+    |> Enum.reduce(&(&1 * &2))
+  end
+
   def find_lowpoints(map) do
     Map.filter(map, fn {k, v} -> low_point?(map, {k, v}) end)
+  end
+
+  @basin_kernel [{-1, 0}, {1, 0}, {0, -1}, {0, 1}]
+  def find_basin(map, {x, y}, found \\ MapSet.new()) do
+    current_depth = Map.get(map, {x, y})
+
+    found = MapSet.put(found, {x, y})
+
+    for {dx, dy} <- @basin_kernel, reduce: found do
+      found ->
+        pos = {x + dx, y + dy}
+
+        case Map.fetch(map, pos) do
+          {:ok, v} when v > current_depth and v < 9 ->
+            find_basin(map, pos, found |> MapSet.put(pos))
+
+          _ ->
+            found
+        end
+    end
   end
 
   @kernel for(x <- -1..1, y <- -1..1, do: {x, y}) -- [{0, 0}]
@@ -44,3 +73,7 @@ end
 Day9.read_map("input.txt")
 |> Day9.part1()
 |> IO.inspect(label: "part1")
+
+Day9.read_map("input.txt")
+|> Day9.part2()
+|> IO.inspect(label: "part2")
