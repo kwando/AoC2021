@@ -29,12 +29,12 @@ defmodule Day9 do
       found ->
         pos = {x + dx, y + dy}
 
-        case Map.fetch(map, pos) do
-          {:ok, v} when v > current_depth and v < 9 ->
-            find_basin(map, pos, found |> MapSet.put(pos))
+        v = Map.get(map, pos, 9)
 
-          _ ->
-            found
+        if v > current_depth and v < 9 do
+          find_basin(map, pos, found |> MapSet.put(pos))
+        else
+          found
         end
     end
   end
@@ -43,10 +43,7 @@ defmodule Day9 do
 
   def low_point?(map, {{x, y}, value}) do
     Enum.all?(@kernel, fn {dx, dy} ->
-      case Map.fetch(map, {x + dx, y + dy}) do
-        :error -> true
-        {:ok, v} -> v > value
-      end
+      Map.get(map, {x + dx, y + dy}, 9) > value
     end)
   end
 
