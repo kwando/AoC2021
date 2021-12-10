@@ -6,15 +6,14 @@ defmodule Day10 do
   end
 
   def part2(input) do
-    scores =
-      for row = {:incomplete, stack} <- input do
-        incomplete_score(stack)
-      end
-
-    scores
-    |> Enum.sort()
-    |> Enum.at(div(length(scores), 2))
+    for row = {:incomplete, stack} <- input do
+      incomplete_score(stack)
+    end
+    |> median()
   end
+
+  defp median(list), do: middle(Enum.sort(list))
+  defp middle(list), do: Enum.at(list, div(length(list), 2))
 
   def parse(row), do: parse(row, [], 0)
 
