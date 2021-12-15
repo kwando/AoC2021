@@ -6,22 +6,15 @@ defmodule Day5 do
     |> Enum.count(fn {_pos, v} -> v >= 2 end)
   end
 
-  defp vertical?({_, {{_, 0}, _}}), do: true
+  defp vertical?({_, {_, 0}, _}), do: true
   defp vertical?(_), do: false
-  defp horizontal?({_, {{0, _}, _}}), do: true
+  defp horizontal?({_, {0, _}, _}), do: true
   defp horizontal?(_), do: false
 
   def part2(lines) do
     lines
     |> draw_lines()
     |> Enum.count(fn {_pos, v} -> v >= 2 end)
-  end
-
-  defp to_vector({{x1, y1}, {x2, y2}}) do
-    dx = x2 - x1
-    dy = y2 - y1
-
-    {{x1, y1}, vectorize({dx, dy})}
   end
 
   def draw_lines(lines) do
@@ -31,7 +24,7 @@ defmodule Day5 do
     end
   end
 
-  def draw_line(map, {start, {delta, len}}) when is_tuple(delta) do
+  def draw_line(map, {start, delta, len}) when is_tuple(delta) do
     for n <- 0..len, reduce: map do
       map ->
         pos = delta |> scale(n) |> add(start)
@@ -92,6 +85,15 @@ defmodule Day5 do
 
   defp add({x1, y1}, {x2, y2}), do: {x1 + x2, y1 + y2}
   defp scale({x, y}, s) when is_number(s), do: {x * s, y * s}
+
+  defp to_vector({{x1, y1}, {x2, y2}}) do
+    dx = x2 - x1
+    dy = y2 - y1
+
+    {dir, len} = vectorize({dx, dy})
+    {{x1, y1}, dir, len}
+  end
+
   defp vectorize({0, y}), do: {{0, sign(y)}, abs(y)}
   defp vectorize({x, 0}), do: {{sign(x), 0}, abs(x)}
   defp vectorize({x, y}) when abs(x) == abs(y), do: {{sign(x), sign(y)}, abs(x)}
