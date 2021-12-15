@@ -1,10 +1,22 @@
 defmodule Day4 do
-  def part1(input) do
-    input
+  def part1(game) do
+    game
     |> play()
     |> case do
       {:bingo, {number, [{numbers_left, _}]}, game} ->
         Enum.sum(numbers_left) * number
+    end
+  end
+
+  def part2(game) do
+    game
+    |> play()
+    |> case do
+      {:bingo, {number, [{numbers_left, _}]}, {sequence, []}} ->
+        Enum.sum(numbers_left) * number
+
+      {:bingo, _, game} ->
+        part2(game)
     end
   end
 
@@ -25,12 +37,12 @@ defmodule Day4 do
   def play_round(number, boards) do
     updated_boards = mark_boards(boards, number)
 
-    bingo_boards = updated_boards |> Enum.filter(&bingo?/1)
+    {bingo_boards, non_bingo_boards} = updated_boards |> Enum.split_with(&bingo?/1)
 
     if bingo_boards == [] do
-      {:continue, updated_boards}
+      {:continue, non_bingo_boards}
     else
-      {:bingo, bingo_boards, updated_boards}
+      {:bingo, bingo_boards, non_bingo_boards}
     end
   end
 
@@ -116,3 +128,9 @@ Day4.part1(example)
 
 Day4.part1(input)
 |> IO.inspect(label: "part1 input")
+
+Day4.part2(example)
+|> IO.inspect(label: "part2 example")
+
+Day4.part2(input)
+|> IO.inspect(label: "part2 input")
