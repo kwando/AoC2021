@@ -167,7 +167,7 @@ defmodule Day13 do
     for y <- 0..height do
       [
         for x <- 0..width do
-          if MapSet.member?(positions, {x, y}), do: ?#, else: ?\s
+          if MapSet.member?(positions, {x, y}), do: "#  ", else: "   "
         end,
         ?\n
       ]
