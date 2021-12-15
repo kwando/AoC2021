@@ -1,18 +1,18 @@
 defmodule Day5 do
-  def vertical_line?({{x1, _}, {x2, _}}), do: x1 == x2
-  def horizontal_line?({{_, y1}, {_, y2}}), do: y1 == y2
-
   def part1(lines) do
     lines
-    |> Enum.filter(fn line -> vertical_line?(line) || horizontal_line?(line) end)
-    |> Enum.map(&to_vector/1)
+    |> Enum.filter(fn line -> vertical?(line) || horizontal?(line) end)
     |> draw_lines()
     |> Enum.count(fn {_pos, v} -> v >= 2 end)
   end
 
+  defp vertical?({_, {{_, 0}, _}}), do: true
+  defp vertical?(_), do: false
+  defp horizontal?({_, {{0, _}, _}}), do: true
+  defp horizontal?(_), do: false
+
   def part2(lines) do
     lines
-    |> Enum.map(&to_vector/1)
     |> draw_lines()
     |> Enum.count(fn {_pos, v} -> v >= 2 end)
   end
@@ -23,12 +23,6 @@ defmodule Day5 do
 
     {{x1, y1}, vectorize({dx, dy})}
   end
-
-  defp vectorize({0, y}), do: {{0, sign(y)}, abs(y)}
-  defp vectorize({x, 0}), do: {{sign(x), 0}, abs(x)}
-  defp vectorize({x, y}) when abs(x) == abs(y), do: {{sign(x), sign(y)}, abs(x)}
-  defp sign(x) when x > 0, do: 1
-  defp sign(_), do: -1
 
   def draw_lines(lines) do
     for line <- lines, reduce: %{} do
@@ -42,16 +36,6 @@ defmodule Day5 do
       map ->
         pos = delta |> scale(n) |> add(start)
         Map.update(map, pos, 1, &(&1 + 1))
-    end
-  end
-
-  defp add({x1, y1}, {x2, y2}), do: {x1 + x2, y1 + y2}
-  defp scale({x, y}, s) when is_number(s), do: {x * s, y * s}
-
-  def draw_line(map, {{sx, sy}, {ex, ey}}) do
-    for x <- sx..ex, y <- sy..ey, reduce: map do
-      map ->
-        Map.update(map, {x, y}, 1, &(&1 + 1))
     end
   end
 
@@ -97,6 +81,7 @@ defmodule Day5 do
     |> String.split(" -> ", trim: true)
     |> Enum.map(&parse_position/1)
     |> List.to_tuple()
+    |> to_vector()
   end
 
   defp parse_position(pos) do
@@ -104,6 +89,14 @@ defmodule Day5 do
     |> Enum.map(&String.to_integer/1)
     |> List.to_tuple()
   end
+
+  defp add({x1, y1}, {x2, y2}), do: {x1 + x2, y1 + y2}
+  defp scale({x, y}, s) when is_number(s), do: {x * s, y * s}
+  defp vectorize({0, y}), do: {{0, sign(y)}, abs(y)}
+  defp vectorize({x, 0}), do: {{sign(x), 0}, abs(x)}
+  defp vectorize({x, y}) when abs(x) == abs(y), do: {{sign(x), sign(y)}, abs(x)}
+  defp sign(x) when x > 0, do: 1
+  defp sign(_), do: -1
 end
 
 example = Day5.read_data("example.txt")
